@@ -5,34 +5,65 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Secure, fast, and minimal direct-to-Drive file dumping platform.">
     <title>DumpStation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
+
+    <!-- Ambient background orbs -->
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <!-- Noise texture overlay -->
+    <div class="noise"></div>
+
     <div class="container">
+
         <header>
-            <h1>DumpStation</h1>
-            <p>Secure, unlimited direct-to-Drive file dumping.</p>
+            <div class="logo-mark">DS</div>
+            <div class="header-text">
+                <h1>DumpStation</h1>
+                <p>Brutally fast. Direct to Drive.</p>
+            </div>
+            <div class="header-badge">
+                <span class="pulse-dot"></span>
+                LIVE
+            </div>
         </header>
 
         <main>
             <div id="drop-zone" class="drop-zone">
+                <div class="drop-zone-glow"></div>
                 <div class="drop-content">
-                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" class="upload-icon">
-                        <path d="M7 16V10M7 10L4 13M7 10L10 13M17 10H14M14 10V16M14 10L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M21 16C21 18.2091 19.2091 20 17 20H7C4.79086 20 3 18.2091 3 16C3 14.1554 4.25055 12.5532 5.962 12.1643C6.44432 9.25267 8.96417 7 12 7C14.7431 7 17.0705 8.90595 17.7954 11.4552C19.6432 11.7583 21 13.3101 21 15.1429V16Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-                    </svg>
-                    <h3>Drag & Drop files here</h3>
-                    <p>or click to browse locally</p>
+                    <div class="icon-wrapper">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" class="upload-icon">
+                            <path d="M12 3v13M12 3L8 7M12 3l4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M3 17v1a3 3 0 003 3h12a3 3 0 003-3v-1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <h3>Drop files here</h3>
+                    <p>or <span class="browse-link">browse locally</span></p>
+                    <div class="file-types">
+                        <span>IMG</span><span>VID</span><span>DOC</span><span>ZIP</span><span>ANY</span>
+                    </div>
                     <input type="file" id="file-input" multiple hidden>
                 </div>
+                <div class="corner-mark top-left"></div>
+                <div class="corner-mark top-right"></div>
+                <div class="corner-mark bottom-left"></div>
+                <div class="corner-mark bottom-right"></div>
             </div>
 
-            <div id="upload-list" class="upload-list">
-                <!-- Upload items will dynamically appear here -->
-            </div>
+            <div id="upload-list" class="upload-list"></div>
         </main>
+
+        <footer>
+            <span>DIRECT-TO-DRIVE · RESUMABLE · UNLIMITED SIZE</span>
+        </footer>
     </div>
+
     <script src="app.js"></script>
 </body>
 </html>

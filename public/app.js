@@ -2,7 +2,6 @@ const dropZone = document.getElementById('drop-zone');
 const fileInput = document.getElementById('file-input');
 const uploadList = document.getElementById('upload-list');
 
-// Drag and drop event listeners
 ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
     dropZone.addEventListener(eventName, preventDefaults, false);
 });
@@ -13,25 +12,16 @@ function preventDefaults(e) {
 }
 
 ['dragenter', 'dragover'].forEach(eventName => {
-    dropZone.addEventListener(eventName, highlight, false);
+    dropZone.addEventListener(eventName, () => dropZone.classList.add('highlight'), false);
 });
 
 ['dragleave', 'drop'].forEach(eventName => {
-    dropZone.addEventListener(eventName, unhighlight, false);
+    dropZone.addEventListener(eventName, () => dropZone.classList.remove('highlight'), false);
 });
 
-function highlight(e) { dropZone.classList.add('highlight'); }
-function unhighlight(e) { dropZone.classList.remove('highlight'); }
-
-// Handle drops and clicks
-dropZone.addEventListener('drop', handleDrop, false);
+dropZone.addEventListener('drop', (e) => handleFiles(e.dataTransfer.files), false);
 dropZone.addEventListener('click', () => fileInput.click());
 fileInput.addEventListener('change', function () { handleFiles(this.files); });
-
-function handleDrop(e) {
-    const files = e.dataTransfer.files;
-    handleFiles(files);
-}
 
 function handleFiles(files) {
     [...files].forEach(uploadFile);
@@ -58,6 +48,7 @@ function createProgressUI(id, filename) {
 function updateProgressUI(id, percent, isComplete = false, errorMsg = null) {
     const progressBar = document.getElementById(`progress-${id}`);
     const statusText = document.getElementById(`status-${id}`);
+    const item = document.getElementById(`upload-${id}`);
 
     if (progressBar) progressBar.style.width = `${percent}%`;
 
@@ -65,17 +56,20 @@ function updateProgressUI(id, percent, isComplete = false, errorMsg = null) {
         if (errorMsg) {
             statusText.textContent = errorMsg;
             statusText.className = 'status error';
-            if (progressBar) progressBar.style.background = '#ef4444';
+            if (progressBar) progressBar.style.background = '#ff4d4d';
+            if (item) item.classList.add('errored');
         } else if (isComplete) {
-            statusText.textContent = 'DONE';
+            statusText.textContent = 'DONE ✓';
             statusText.className = 'status success';
+            if (item) item.classList.add('done');
             setTimeout(() => {
-                const item = document.getElementById(`upload-${id}`);
                 if (item) {
                     item.style.opacity = '0';
+                    item.style.transform = 'translateX(12px)';
+                    item.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
                     setTimeout(() => item.remove(), 500);
                 }
-            }, 3000); // Remove successful items after 3s
+            }, 3000);
         } else {
             statusText.textContent = `${percent}%`;
         }
@@ -87,7 +81,6 @@ async function uploadFile(file) {
     createProgressUI(id, file.name);
 
     try {
-        // Step 1: Request Resumable Upload URL from our Backend
         const res = await fetch('/api/get-upload-url', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -105,7 +98,6 @@ async function uploadFile(file) {
 
         const { uploadUrl } = await res.json();
 
-        // Step 2: Upload file DIRECTLY to Google Drive (circumventing our Node backend)
         const xhr = new XMLHttpRequest();
         xhr.open('PUT', uploadUrl, true);
         xhr.setRequestHeader('Content-Type', file.type || 'application/octet-stream');
@@ -125,9 +117,7 @@ async function uploadFile(file) {
             }
         };
 
-        xhr.onerror = () => {
-            updateProgressUI(id, 0, false, 'Network error during Drive upload');
-        };
+        xhr.onerror = () => updateProgressUI(id, 0, false, 'Network error during upload');
 
         xhr.send(file);
     } catch (err) {
