@@ -1,0 +1,8 @@
+node_modules/
+.env
+.env.*
+token.json
+oauth_credentials.json
+credentials.json
+test.js
+.DS_Store
