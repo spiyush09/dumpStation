@@ -10,6 +10,12 @@ It's a private, minimal web app that uploads files directly to a specific Google
 
 ---
 
+## Screenshots
+
+<img width="1865" height="931" alt="Screenshot (229)" src="https://github.com/user-attachments/assets/9302b5bc-958c-45fc-b1b8-2a402788f05b" />
+
+---
+
 ## Features
 
 - **Direct-to-Drive Resumable Uploads**: Upload 2GB+ massive files securely. The file goes directly from the browser to Google Drive in chunks, completely bypassing the backend server.
