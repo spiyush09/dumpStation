@@ -13,7 +13,6 @@ async function getResumableUploadUrl(filename, mimeType, size, origin = 'http://
     }
 
     try {
-        // Read from env vars (for deployment) or fall back to local files (for local dev)
         let credentials, token;
 
         if (process.env.OAUTH_CREDENTIALS) {
@@ -32,6 +31,16 @@ async function getResumableUploadUrl(filename, mimeType, size, origin = 'http://
         const redirect_uri = redirect_uris ? redirect_uris[0] : 'urn:ietf:wg:oauth:2.0:oob';
         const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uri);
         oAuth2Client.setCredentials(token);
+
+        // Auto-save refreshed tokens so they never go stale
+        oAuth2Client.on('tokens', (newTokens) => {
+            const current = JSON.parse(fs.readFileSync('token.json'));
+            const updated = { ...current, ...newTokens };
+            fs.writeFileSync('token.json', JSON.stringify(updated));
+            if (process.env.OAUTH_TOKEN) {
+                process.env.OAUTH_TOKEN = JSON.stringify(updated);
+            }
+        });
 
         const response = await oAuth2Client.request({
             url: 'https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable',
