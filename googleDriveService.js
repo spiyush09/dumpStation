@@ -32,14 +32,18 @@ async function getResumableUploadUrl(filename, mimeType, size, origin = 'http://
         const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uri);
         oAuth2Client.setCredentials(token);
 
-        // Auto-save refreshed tokens so they never go stale
+        // Auto-save refreshed tokens — safe for both Render and local
         oAuth2Client.on('tokens', (newTokens) => {
-            const current = JSON.parse(fs.readFileSync('token.json'));
+            const current = JSON.parse(process.env.OAUTH_TOKEN || '{}');
             const updated = { ...current, ...newTokens };
-            fs.writeFileSync('token.json', JSON.stringify(updated));
-            if (process.env.OAUTH_TOKEN) {
-                process.env.OAUTH_TOKEN = JSON.stringify(updated);
-            }
+            // Update in-memory env var so current session stays authenticated
+            process.env.OAUTH_TOKEN = JSON.stringify(updated);
+            // Only write to disk if running locally (file already exists)
+            try {
+                if (fs.existsSync('token.json')) {
+                    fs.writeFileSync('token.json', JSON.stringify(updated));
+                }
+            } catch (_) {}
         });
 
         const response = await oAuth2Client.request({
